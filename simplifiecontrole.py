@@ -1,6 +1,5 @@
 import tellopy
 import time
-import numpy as np
 from math import sqrt, atan, degrees
 
 
@@ -199,16 +198,25 @@ orientationDrone = 0
 drone = Drone()
 dir = (5, 6)
 
-a = -8
-b = 8
+a = 0
+b = 0
 c = a, b
 for x in range(0, 12):
+    x += 1
     if x % 3 == 0:
         a,b = (0,0)
     else:
         if x == 5 or x == 6 or x == 8:
             b = -8
-        elif x == 3 or x == 9 or x == 2222:
-            pass
-
+        elif x == 3 or x == 9:
+            b = 0
+        elif x == 2 or x == 11 or x == 12:
+            b  = 8
+        elif x == 2 or x == 3 or x ==5:
+            a = -8
+        elif x == 6 or x == 10:
+            a = 0
+        elif x == 8 or x == 9 or x == 10:
+            a = 8
+    print(x, "  ",a,b)
     time.sleep(0.5)
