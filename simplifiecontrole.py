@@ -87,9 +87,24 @@ class Drone():
         # trigonometrie basique angle = artant(oposé/adjasant)
         angle = atan(vecteur[1] / vecteur[0])
         angle = degrees(angle)
-        angle = 90 - angle  # angle par rappor a l'axe y
         angle, normevecteur = (angle, normevecteur /
                                self.ECHELEVECTEUR)  # Convertion en m
+        print(angle)
+        if vecteur[0] >= 0 and vecteur[1] >= 0:
+            angle = 90-angle
+            print("cas 1, angle = {}, vecteur = {}".format(angle,vecteur))
+        elif vecteur[0] <= 0 and vecteur[1] >= 0 :
+            angle = -90-angle
+            print("cas 2, angle = {}, vecteur = {}".format(angle,vecteur))
+
+        elif vecteur[0] <= 0 and vecteur[1] <=0:
+            angle = -90-angle
+            print("cas 3, angle = {}, vecteur = {}".format(angle,vecteur))
+
+        elif vecteur[0] >= 0 and vecteur[1] <=0:
+            angle = 90-angle
+            print("cas 4, angle = {}, vecteur = {}".format(angle,vecteur))
+
         return normevecteur, angle
 
     # ---- Partie simplification des deplacement avancé
@@ -221,5 +236,7 @@ dir = (5, 6)
 a = 0
 b = 0
 c = a, b
-print(donne_pos_tour(2))
-print(donne_pos_tour(657609590))
+drone.go_to((2,2))
+drone.go_to((-2,2))
+drone.go_to((-2,-2))
+drone.go_to((2,-2))
