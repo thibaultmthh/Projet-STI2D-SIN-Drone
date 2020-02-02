@@ -183,6 +183,26 @@ def calcul_trajectoire(pos1,pos2):
     return normevecteur , x
 """
 
+def donne_pos_tour(x):
+    while x > 12:
+        x -= 12
+    if x ==1 or x == 4 or x == 7 or x == 10:
+        a,b = (0,0)
+    else:
+        if x == 5 or x == 6 or x == 8:
+            b = -8
+        if x == 3 or x == 9:
+            b = 0
+        if x == 2 or x == 11 or x == 12:
+            b  = 8
+        if x == 2 or x == 3 or x ==5:
+            a = -8
+        if x == 6 or x == 10 or x == 12:
+            a = 0
+        if x == 8 or x == 9 or x == 11:
+            a = 8
+    return a,b
+
 
 XSalle = 18 * 100
 YSalle = 15 * 100
@@ -201,22 +221,5 @@ dir = (5, 6)
 a = 0
 b = 0
 c = a, b
-for x in range(0, 12):
-    x += 1
-    if x % 3 == 0:
-        a,b = (0,0)
-    else:
-        if x == 5 or x == 6 or x == 8:
-            b = -8
-        elif x == 3 or x == 9:
-            b = 0
-        elif x == 2 or x == 11 or x == 12:
-            b  = 8
-        elif x == 2 or x == 3 or x ==5:
-            a = -8
-        elif x == 6 or x == 10:
-            a = 0
-        elif x == 8 or x == 9 or x == 10:
-            a = 8
-    print(x, "  ",a,b)
-    time.sleep(0.5)
+print(donne_pos_tour(2))
+print(donne_pos_tour(657609590))
