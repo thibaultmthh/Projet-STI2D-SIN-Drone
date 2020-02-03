@@ -85,8 +85,11 @@ class Drone():
         # a² + b² = c² pour trouver la norme avec pytagore sortie sans unitée
         normevecteur = sqrt(vecteur[0]**2 + vecteur[1]**2)
         # trigonometrie basique angle = artant(oposé/adjasant)
-        angle = atan(vecteur[1] / vecteur[0])
-        angle = degrees(angle)
+        if vecteur[0] != 0:
+            angle = atan(vecteur[1] / vecteur[0])
+            angle = degrees(angle)
+        else:
+            angle = 0
         angle, normevecteur = (angle, normevecteur /
                                self.ECHELEVECTEUR)  # Convertion en m
         print(angle)
