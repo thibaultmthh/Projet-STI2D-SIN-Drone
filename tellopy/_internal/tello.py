@@ -855,5 +855,14 @@ class Tello(object):
 
         log.info('exit from the video thread.')
 
+
+
+    # partie custom
+
+
+
+
 if __name__ == '__main__':
     print('You can use test.py for testing.')
+
+drone = Tello("", 8889)
