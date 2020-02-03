@@ -39,15 +39,18 @@ class fakeDrone():
 
     def down(*arg):
         print("je down", arg[1:])
-
+    def takeoff(*arg):
+        print("takeoff")
+    def land(*arg):
+        print("land")
 
 class Drone():
     def __init__(self):
         self.LIMIT_ALT = 2
         self.SDELAY = 1
         self.BDELAY = 20
-        self.TESTING = True
-        self.ECHELEVECTEUR = 0.1
+        self.TESTING = False
+        self.ECHELEVECTEUR = 0.06
 
         self.position = (0, 0)
 
@@ -58,8 +61,13 @@ class Drone():
 
         self.tello.connect()
         self.tello.wait_for_connection(60.0)
-
+        self.tello.takeoff()
         self.tello.set_alt_limit(self.LIMIT_ALT)
+        self.tello.up(50)
+        time.sleep(6)
+        self.tello.up(0)
+        #self.tello.down(50)
+        time.sleep(self.SDELAY)
 
     # ----- Update des données internes ----
 
@@ -69,19 +77,31 @@ class Drone():
     # ----Convertion des distance/angle en vitesse et temps de deplacement-----
 
     def distance_to_speed_nd_time(self, distance):
-        speed = 60
-        delay = (0.0177 * distance) + 0.256
+        """Prend comme parametre la distance en cm"""
+        if distance > 8:
+            speed = 60
+            delay = (0.0177 * distance) + 0.256
+        else:
+            speed = 0
+            delay = 0
         return (speed, delay)
 
     def angle_to_speed_nd_time(self, angle):
-        speed = 120
-        delay = 0.0111 * angle
+        """Prend comme parametre un angle en degrees"""
+        if angle > 0.05:
+            speed = 120
+            delay = 0.0111 * angle
+        else:
+            speed = 0
+            delay = 0
         return (speed, delay)
 
     # ----- Calcule de trajectoire interne -----
     def calcul_trajectoire(self, pos1, pos2):
+        print("pos1, pos2", pos1, pos2)
         """return la distance et l'angle par rapport a l'axe y de l'a trajectoire la plus courte de 2 points"""
         vecteur = (pos2[0] - pos1[0], pos2[1] - pos1[1])  # xB - xA , yB-yA
+        print("vecteur", vecteur)
         # a² + b² = c² pour trouver la norme avec pytagore sortie sans unitée
         normevecteur = sqrt(vecteur[0]**2 + vecteur[1]**2)
         # trigonometrie basique angle = artant(oposé/adjasant)
@@ -90,23 +110,34 @@ class Drone():
             angle = degrees(angle)
         else:
             angle = 0
+
         angle, normevecteur = (angle, normevecteur /
                                self.ECHELEVECTEUR)  # Convertion en m
         print(angle)
-        if vecteur[0] >= 0 and vecteur[1] >= 0:
+        print(angle)
+
+
+
+
+
+        if vecteur[0] > 0 and vecteur[1] >= 0:
             angle = 90-angle
             print("cas 1, angle = {}, vecteur = {}".format(angle,vecteur))
-        elif vecteur[0] <= 0 and vecteur[1] >= 0 :
+        elif vecteur[0] < 0 and vecteur[1] >= 0 :
             angle = -90-angle
             print("cas 2, angle = {}, vecteur = {}".format(angle,vecteur))
 
-        elif vecteur[0] <= 0 and vecteur[1] <=0:
+        elif vecteur[0] < 0 and vecteur[1] <=0:
             angle = -90-angle
             print("cas 3, angle = {}, vecteur = {}".format(angle,vecteur))
 
-        elif vecteur[0] >= 0 and vecteur[1] <=0:
+        elif vecteur[0] > 0 and vecteur[1] <=0:
             angle = 90-angle
             print("cas 4, angle = {}, vecteur = {}".format(angle,vecteur))
+
+        if vecteur[0] == 0 and vecteur[1] < 0:
+            angle = -180
+
 
         return normevecteur, angle
 
@@ -116,9 +147,13 @@ class Drone():
         pos1 = self.position
         pos2 = pos
         distance, angle = self.calcul_trajectoire(pos1, pos2)
+        print('distance, angle', distance, angle)
         self.tourne(angle)
+        time.sleep(0.3)
         self.avant(distance)
+        time.sleep(self.SDELAY)
         self.tourne(-angle)
+        time.sleep(0.3)
         return pos2
 
     def tourne(self, angle):
@@ -135,24 +170,33 @@ class Drone():
         self.tello.counter_clockwise(speed)
         time.sleep(delay)
         self.tello.counter_clockwise(0)
+        time.sleep(0.1)
+
 
     def tourne_droite(self, angle):
         speed, delay = self.angle_to_speed_nd_time(angle)
         self.tello.clockwise(speed)
         time.sleep(delay)
         self.tello.clockwise(0)
+        time.sleep(0.1)
+
 
     def avant(self, distance):
         speed, delay = self.distance_to_speed_nd_time(distance)
+        print("speed delay", speed, delay)
         self.tello.forward(speed)
         time.sleep(delay)
         self.tello.forward(0)
+        time.sleep(self.SDELAY)
+
 
     def arriere(self, distance):
         speed, delay = self.distance_to_speed_nd_time(distance)
         self.tello.backward(speed)
         time.sleep(delay)
         self.tello.backward(0)
+        time.sleep(self.SDELAY)
+
 
     def droite(self, distance):
         speed, delay = self.distance_to_speed_nd_time(distance)
@@ -165,6 +209,8 @@ class Drone():
         self.tello.left(speed)
         time.sleep(delay)
         self.tello.left(0)
+        time.sleep(self.SDELAY)
+
 
         # TODO: calibrage de la montée descente
     def haut(self, distance):
@@ -172,12 +218,19 @@ class Drone():
         self.tello.up(speed)
         time.sleep(delay)
         self.tello.up(0)
+        time.sleep(self.SDELAY)
+
 
     def bas(self, distance):
         speed, delay = self.distance_to_speed_nd_time(distance)
         self.tello.down(speed)
         time.sleep(delay)
         self.tello.down(0)
+        time.sleep(self.SDELAY)
+
+    def landing(self):
+        self.tello.land()
+
 
 
 #########################################Partie perso################################################
@@ -202,23 +255,24 @@ def calcul_trajectoire(pos1,pos2):
 """
 
 def donne_pos_tour(x):
+    e = 2
     while x > 12:
         x -= 12
     if x ==1 or x == 4 or x == 7 or x == 10:
         a,b = (0,0)
     else:
         if x == 5 or x == 6 or x == 8:
-            b = -8
+            b = -e
         if x == 3 or x == 9:
             b = 0
         if x == 2 or x == 11 or x == 12:
-            b  = 8
+            b  = e
         if x == 2 or x == 3 or x ==5:
-            a = -8
+            a = -e
         if x == 6 or x == 10 or x == 12:
             a = 0
         if x == 8 or x == 9 or x == 11:
-            a = 8
+            a = e
     return a,b
 
 
@@ -234,12 +288,15 @@ orientationDrone = 0
 
 
 drone = Drone()
-dir = (5, 6)
 
-a = 0
-b = 0
-c = a, b
-drone.go_to((2,2))
-drone.go_to((-2,2))
-drone.go_to((-2,-2))
-drone.go_to((2,-2))
+
+def a(dir):
+    drone.go_to(dir)
+    drone.set_new_pos(dir)
+
+a((0,5))
+a((14,10))
+a((2,2))
+a((0,0))
+
+drone.landing()
