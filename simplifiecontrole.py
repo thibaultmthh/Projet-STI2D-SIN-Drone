@@ -1,6 +1,12 @@
-import tellopy
 import time
 from math import sqrt, atan, degrees
+import threading
+
+import cv2
+
+import tellopy
+
+print("all loaded")
 
 
 class fakeDrone():
@@ -49,8 +55,16 @@ class Drone():
         self.LIMIT_ALT = 2
         self.SDELAY = 1
         self.BDELAY = 20
-        self.TESTING = False
+        self.TESTING = True
         self.ECHELEVECTEUR = 0.06
+
+
+
+        self.frame = None
+        self.get_stream_thread = threading.Thread(target=self.get_stream)
+        self.get_stream_thread.start()
+
+
 
         self.position = (0, 0)
 
@@ -68,6 +82,30 @@ class Drone():
         self.tello.up(0)
         #self.tello.down(50)
         time.sleep(self.SDELAY)
+
+
+    #------ Partie video ------#
+
+    def get_stream(self):
+        """Boucle infinie qui recupère les images de la camera du drone"""
+        if self.TESTING:
+            while True:
+                cap = cv2.VideoCapture("data/salle1.mp4")
+
+                while cap.isOpened:
+                    time.sleep(0.02)
+                    ret, frame = cap.read()
+                    if ret:
+                        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+                        self.frame = gray
+
+                    else:
+                        break
+
+    def get_frame(self):
+        """return la derniere frame captée par la camera"""
+        return self.frame
+
 
     # ----- Update des données internes ----
 
@@ -115,11 +153,6 @@ class Drone():
                                self.ECHELEVECTEUR)  # Convertion en m
         print(angle)
         print(angle)
-
-
-
-
-
         if vecteur[0] > 0 and vecteur[1] >= 0:
             angle = 90-angle
             print("cas 1, angle = {}, vecteur = {}".format(angle,vecteur))
@@ -242,18 +275,6 @@ def avancer(dist, pos, orientation):
     return pos
 
 
-"""
-def calcul_trajectoire(pos1,pos2):
-    #"return la distance et l'angle par rapport a l'axe y de l'a trajectoire la plus courte de 2 points"
-
-    vecteur = (pos2[0]-pos1[0],pos2[1]-pos1[1]) #xB - xA , yB-yA
-    normevecteur = sqrt(vecteur[0]**2 + vecteur[1]**2) #a² + b² = c² pour trouver la norme avec pytagore sortie sans unitée
-    x = atan(vecteur[1]/vecteur[0]) # trigonometrie basique angle = artant(oposé/adjasant)
-    x = degrees(x)
-    x = 90-x # angle par rappor a l'axe y
-    return normevecteur , x
-"""
-
 def donne_pos_tour(x):
     e = 2
     while x > 12:
@@ -289,6 +310,7 @@ orientationDrone = 0
 
 drone = Drone()
 
+<<<<<<< HEAD
 
 def a(dir):
     drone.go_to(dir)
@@ -300,3 +322,12 @@ a((2,2))
 a((0,0))
 
 drone.landing()
+=======
+while True:
+    time.sleep(0.5)
+    frame = drone.get_frame()
+    cv2.imshow("test", frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        cv2.destroyAllWindows()
+        exit(0)
+>>>>>>> d7bd59383c1e3637ad1779bebff1aaf6d8d77af3
