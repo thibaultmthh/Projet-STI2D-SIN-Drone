@@ -294,8 +294,8 @@ def a(dir):
     drone.go_to(dir)
     drone.set_new_pos(dir)
 
-a((0,5))
-a((14,10))
+a((0,1))
+a((1,0))
 a((2,2))
 a((0,0))
 
