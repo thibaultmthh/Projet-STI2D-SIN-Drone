@@ -14,7 +14,7 @@ datas = {"temperature": 0,
          "luminosite": 0,
          "deplacement": "standby",
          "batterie": 0,
-         "alerte": None}
+         "alerte": []}
 
 
 """
@@ -82,6 +82,7 @@ def index(*arg):
 
 # routes pour recuperer des infos
 
+
 @app.route(routes["get_all_datas"])
 def all_data():
     return datas
@@ -126,7 +127,6 @@ def get_alert():
 
 @app.route("/set", methods=['GET', 'POST'])
 def page_set():
-
     for key, data in request.form.items():
         data = request.form.getlist(key)
         if len(data) == 1:
