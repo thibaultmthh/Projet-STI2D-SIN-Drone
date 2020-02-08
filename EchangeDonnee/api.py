@@ -83,8 +83,9 @@ def index(*arg):
 # routes pour recuperer des infos
 
 @app.route(routes["get_all_datas"])
-def xddaahah():
+def all_data():
     return datas
+
 
 @app.route(routes["get_temperature"])
 def get_temperature():
@@ -127,12 +128,16 @@ def get_alert():
 def page_set():
 
     for key, data in request.form.items():
-        set_data(key, data)
+        data = request.form.getlist(key)
+        if len(data) == 1:
+            set_data(key, data[0])
+        else:
+            set_data(key, data)
     return "OK"
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='127.0.0.1')
 
 
 """
