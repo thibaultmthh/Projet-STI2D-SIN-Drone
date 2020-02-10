@@ -8,12 +8,12 @@ import json
 app = Flask(__name__)
 
 
-datas = {"temperature": 0,
-         "fumee": False,
-         "presence": False,
-         "luminosite": 0,
+datas = {"temperature": "0",
+         "fumee": "False",
+         "presence": "False",
+         "luminosite": "0",
          "deplacement": "standby",
-         "batterie": 0,
+         "batterie": "0",
          "alerte": []}
 
 
